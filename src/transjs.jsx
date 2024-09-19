@@ -115,7 +115,7 @@ export default function TextEditorLLM() {
           borderRadius: "", // Rounded corners for a unique look
         }}
       ></div>
-      x{/* AI Response */}
+      {/* AI Response */}
       <div style={{ marginTop: "10px", color: "red" }}>
         {warnings.map((warning, index) => (
           <p key={index}>
