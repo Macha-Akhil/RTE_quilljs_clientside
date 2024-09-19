@@ -3,12 +3,12 @@ import reactLogo from "./assets/react.svg";
 import viteLogo from "/vite.svg";
 import "./App.css";
 
-import TextEditorTransformers from "./transjs.jsx";
+import TextEditorLLM from "./components/sentimentanalysis.jsx";
 
 function App() {
   return (
     <div>
-      <TextEditorTransformers />
+      <TextEditorLLM />
     </div>
   );
 }

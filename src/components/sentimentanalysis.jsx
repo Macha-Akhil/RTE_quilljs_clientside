@@ -103,28 +103,34 @@ export default function TextEditorLLM() {
   }, []);
 
   return (
-    <div style={{ position: "relative", padding: "20px" }}>
-      {/* Quill Editor */}
-      <div
-        ref={editorRef}
-        style={{
-          height: "300px",
-          marginBottom: "10px",
-          border: "1px solid #ccc",
-          backgroundColor: "#f7f7f7", // Custom background color
-          borderRadius: "", // Rounded corners for a unique look
-        }}
-      ></div>
-      {/* AI Response */}
-      <div style={{ marginTop: "10px", color: "red" }}>
-        {warnings.map((warning, index) => (
-          <p key={index}>
-            <strong>Label:</strong> {warning.label} | <strong>Score:</strong>{" "}
-            {warning.score}
-          </p>
-        ))}
+    <>
+      <h1 className="text-3xl font-bold text-center mb-6">
+        Sentiment Analysis Text Editor
+      </h1>
+      <div style={{ position: "relative", padding: "20px" }}>
+        {/* Quill Editor */}
+
+        <div
+          ref={editorRef}
+          style={{
+            height: "300px",
+            marginBottom: "10px",
+            border: "1px solid #ccc",
+            backgroundColor: "#f7f7f7", // Custom background color
+            borderRadius: "", // Rounded corners for a unique look
+          }}
+        ></div>
+        {/* AI Response */}
+        <div style={{ marginTop: "10px", color: "red" }}>
+          {warnings.map((warning, index) => (
+            <p key={index}>
+              <strong>Label:</strong> {warning.label} | <strong>Score:</strong>{" "}
+              {warning.score}
+            </p>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
