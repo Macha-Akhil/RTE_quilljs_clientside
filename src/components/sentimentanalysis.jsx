@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 import { pipeline, env } from "@xenova/transformers";
+import { LoaderCircle } from "lucide-react"; // Import your loader component
+// import { Loader } from "rsuite";
 
 env.allowLocalModels = false;
 env.useBrowserCache = false;
@@ -22,6 +24,7 @@ export default function TextEditorLLM() {
   const [warnings, setWarnings] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const pipelineRef = useRef(null); // To store the pipeline instance
+  const [isModelLoading, setIsModelLoading] = useState(true);
 
   // Function to send content to the LLaMA model via transformers.js
   const sendContentToAPI = async (text) => {
@@ -64,6 +67,7 @@ export default function TextEditorLLM() {
     const loadPipeline = async () => {
       try {
         console.log("Loading model...");
+        setIsModelLoading(true);
         const pipe = await pipeline(
           "sentiment-analysis",
           "Xenova/distilbert-base-uncased-finetuned-sst-2-english"
@@ -74,10 +78,12 @@ export default function TextEditorLLM() {
       } catch (error) {
         console.error("Error loading the model:", error);
       }
+
+      setIsModelLoading(false);
     };
-
     loadPipeline();
-
+  }, []);
+  useEffect(() => {
     if (editorRef.current && !quillInstance.current) {
       quillInstance.current = new Quill(editorRef.current, {
         theme: "snow",
@@ -93,33 +99,55 @@ export default function TextEditorLLM() {
           ],
         },
       });
-
       // Automatically trigger spell-check on text change with debounce
       quillInstance.current.on("text-change", () => {
         setWarnings([]); // Clear warnings when the text changes
         triggerSpellCheck(); // Debounced spell-check
       });
     }
+    return () => {
+      if (quillInstance.current) {
+        quillInstance.current.off("text-change", triggerSpellCheck);
+      }
+    };
   }, []);
 
   return (
     <>
-      <h1 className="text-3xl font-bold text-center mb-6">
-        Sentiment Analysis Text Editor
-      </h1>
-      <div style={{ position: "relative", padding: "20px" }}>
-        {/* Quill Editor */}
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold text-center mb-6">
+          Sentiment Analysis Text Editor
+        </h1>
+        <div className="relative">
+          <div
+            ref={editorRef}
+            style={{
+              height: "300px",
+              marginBottom: "10px",
+              border: "1px solid #ccc",
+              backgroundColor: "#f7f7f7", // Custom background color
+              borderRadius: "", // Rounded corners for a unique look
+            }}
+            className="h-[300px] mb-4 border border-gray-300 rounded-lg bg-white"
+          />
+          {isModelLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80">
+              <div className="text-center">
+                {/* <Loader2 className="w-12 h-12 animate-spin text-blue-500 mx-auto mb-4" /> */}
+                <LoaderCircle className="animate-spin w-12 h-12 text-blue-500 mx-auto mb-4" />
+                <p className="text-lg font-medium text-gray-700">
+                  Loading Sentiment Analysis Model...
+                </p>
+              </div>
+            </div>
+          )}
+          {/* {isLoading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-50">
+              <LoaderCircle className="animate-spin w-12 h-12 text-blue-500 mx-auto mb-4" />
+            </div>
+          )} */}
+        </div>
 
-        <div
-          ref={editorRef}
-          style={{
-            height: "300px",
-            marginBottom: "10px",
-            border: "1px solid #ccc",
-            backgroundColor: "#f7f7f7", // Custom background color
-            borderRadius: "", // Rounded corners for a unique look
-          }}
-        ></div>
         {/* AI Response */}
         <div style={{ marginTop: "10px", color: "red" }}>
           {warnings.map((warning, index) => (
@@ -133,26 +161,3 @@ export default function TextEditorLLM() {
     </>
   );
 }
-
-// const pipe = await pipeline( "text-generation", "Xenova/gpt2");
-// const pipe = await pipeline(
-//   "text2text-generation",
-//   "facebook/bart-large-cnn"
-// );
-// const pipe = await pipeline(
-//   "text2text-generation",
-//   "facebook/bart-large"
-// );
-// const pipe = await pipeline(
-//   "sentiment-analysis",
-//   "distilbert-base-uncased"
-// );
-// const pipe = await pipeline("text-generation", "gpt2");
-// const pipe = await pipeline(
-//   "text2text-generation",
-//   "teapotai/instruct-teapot"
-// );
-// const pipe = await pipeline(
-//   "text2text-generation",
-//   (model = "oliverguhr/spelling-correction-english-base")
-// );
